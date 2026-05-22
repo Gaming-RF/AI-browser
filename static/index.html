@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Browser — An autonomous AI-powered browser agent that works with any AI model including local ones.">
+    <title>AI Browser — Autonomous Agent</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+</head>
+<body>
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+
+    <div class="app-container">
+        <!-- ═══════════════════════════════════════════════
+             SIDEBAR
+             ═══════════════════════════════════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-icon">🌐</div>
+                    AI Browser
+                </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Model</div>
+                <select class="model-selector" id="model-selector">
+                    <optgroup label="☁️ Cloud — OpenAI">
+                        <option value="openai:gpt-4o">GPT-4o</option>
+                        <option value="openai:gpt-4">GPT-4</option>
+                        <option value="openai:gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="openai:gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </optgroup>
+                    <optgroup label="☁️ Cloud — Anthropic">
+                        <option value="anthropic:claude-3-opus-20240229">Claude 3 Opus</option>
+                        <option value="anthropic:claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+                        <option value="anthropic:claude-3-haiku-20240307">Claude 3 Haiku</option>
+                    </optgroup>
+                    <optgroup label="☁️ Cloud — Google">
+                        <option value="gemini:gemini-2.5-pro">Gemini 2.5 Pro</option>
+                        <option value="gemini:gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini:gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
+                        <option value="gemini:gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="gemini:gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </optgroup>
+                    <optgroup label="🖥️ Local — Ollama" id="ollama-models">
+                        <!-- Populated dynamically -->
+                    </optgroup>
+                    <optgroup label="🖥️ Local — Custom">
+                        <option value="custom">Custom endpoint...</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Custom Endpoint (hidden by default) -->
+            <div class="sidebar-section" id="custom-endpoint-section" style="display: none;">
+                <div class="sidebar-section-title">Custom Endpoint</div>
+                <input type="text" class="api-key-input" id="custom-base-url"
+                       placeholder="http://localhost:1234/v1"
+                       style="margin-bottom: 6px;">
+                <input type="text" class="api-key-input" id="custom-model-name"
+                       placeholder="Model name (e.g. mistral)">
+            </div>
+
+            <!-- API Keys -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">API Key</div>
+                <input type="password" class="api-key-input" id="api-key-input"
+                       placeholder="sk-... (reads from .env if empty)">
+            </div>
+
+            <!-- Settings -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Settings</div>
+
+                <div class="setting-row">
+                    <span class="setting-label" title="Toggle between running the browser visibly on your computer vs headless background mode">Display Mode</span>
+                    <select class="model-selector" id="display-mode-selector" style="width: auto; padding: 4px 24px 4px 8px; font-size: 11px;">
+                        <option value="screenshot">Web View (Background)</option>
+                        <option value="live">Native Window (Live)</option>
+                    </select>
+                </div>
+
+                <div class="setting-row">
+                    <span class="setting-label">Vision mode</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="vision-toggle">
+                        <span class="toggle-track"></span>
+                        <span class="toggle-thumb"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span class="setting-label">Max steps</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="range" class="range-slider" id="max-steps-slider"
+                               min="5" max="50" value="15">
+                        <span class="setting-value" id="max-steps-value">15</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Theme</div>
+                <select class="theme-selector" id="theme-selector">
+                    <option value="midnight">🌙 Midnight</option>
+                    <option value="obsidian">⬛ Obsidian</option>
+                    <option value="ocean">🌊 Ocean</option>
+                    <option value="cyberpunk">💜 Cyberpunk</option>
+                    <option value="sunset">🌅 Sunset</option>
+                    <option value="daylight">☀️ Daylight</option>
+                </select>
+            </div>
+
+            <!-- Connection status -->
+            <div class="connection-status" id="connection-status">
+                <span class="connection-dot" id="connection-dot"></span>
+                <span id="connection-text">Disconnected</span>
+            </div>
+
+            <!-- New Chat -->
+            <button class="new-chat-btn" id="new-chat-btn">+ New Task</button>
+
+            <!-- Session History -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">History</div>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- Populated dynamically -->
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════
+             MAIN AREA
+             ═══════════════════════════════════════════════ -->
+        <main class="main-area">
+            <div class="chat-area" id="chat-area">
+                <!-- Welcome screen (shown initially) -->
+                <div class="welcome" id="welcome-screen">
+                    <div class="welcome-icon">🌐</div>
+                    <h1>AI Browser Agent</h1>
+                    <p>Tell me what to do on the web. I'll open a browser, navigate, click, type, and complete tasks for you — powered by any AI model.</p>
+                    <div class="welcome-examples" id="welcome-examples">
+                        <div class="welcome-example" data-task="Go to Wikipedia and search for 'artificial intelligence'">Search Wikipedia</div>
+                        <div class="welcome-example" data-task="Go to Google and search for the current weather in New York">Check weather</div>
+                        <div class="welcome-example" data-task="Navigate to GitHub trending and find the top Python repositories">GitHub trending</div>
+                        <div class="welcome-example" data-task="Go to Amazon and search for 'mechanical keyboard' and sort by price low to high">Shop on Amazon</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input bar -->
+            <div class="input-bar">
+                <div class="input-container" id="input-container">
+                    <input type="text" id="task-input"
+                           placeholder="Tell me what to do on the web..."
+                           autocomplete="off">
+                    <button class="send-btn" id="send-btn" title="Send (Enter)">➤</button>
+                    <button class="stop-btn" id="stop-btn" title="Stop (Esc)" style="display: none;">■</button>
+                </div>
+                <div class="input-hint">
+                    Press <strong>Enter</strong> to send · <strong>Esc</strong> to stop · Works with OpenAI, Anthropic, Ollama &amp; more
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Screenshot lightbox -->
+    <div class="lightbox" id="lightbox" style="display: none;">
+        <img id="lightbox-img" src="" alt="Browser screenshot">
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

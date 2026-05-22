@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0b0f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: #ccc;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        .top-nav {
+            position: absolute;
+            top: 0;
+            left: 250px;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #888;
+            letter-spacing: 1px;
+        }
+
+        .top-nav div { cursor: pointer; }
+        .top-nav div:hover { color: white; }
+        .top-nav .active { color: white; font-size: 16px; letter-spacing: 2px; }
+
+        /* Left Menu */
+        .sidebar {
+            width: 250px;
+            background-color: #111116;
+            border-right: 1px solid #1a1a24;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            color: white;
+            background-color: rgba(255,255,255,0.05);
+        }
+        
+        .menu-item.active {
+            border-left: 3px solid #fa1e4e;
+            padding-left: 17px;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 80px 40px;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            background-color: #1a1a24;
+            border: 1px solid #2a2a35;
+            padding: 10px 15px;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 40px;
+            outline: none;
+        }
+
+        .section-title {
+            font-size: 11px;
+            color: #888;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* Themes Grid */
+        .themes-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .theme-card {
+            width: 120px;
+            height: 80px;
+            background-color: #1a1a24;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .theme-card.active { border-color: #fa1e4e; }
+        .theme-label { font-size: 12px; margin-top: 10px; text-align: center; }
+
+        .theme-1 { background-image: url('theme-red.png'); }
+        .theme-2 { background-image: url('theme-purple.png'); }
+        .theme-3 { background-image: url('theme-blue.png'); }
+
+        /* Settings List */
+        .settings-list {
+            background-color: #14141d;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .setting-row {
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a1a24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .setting-row:last-child { border-bottom: none; }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 36px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 9px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.on { background-color: #fa1e4e; }
+        .toggle.on::after { transform: translateX(18px); }
+
+        .select-box {
+            background-color: #0b0b0f;
+            border: 1px solid #2a2a35;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* Complex Setting Rows */
+        .setting-complex-row {
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a1a24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .setting-complex-row:last-child { border-bottom: none; }
+        
+        .setting-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .setting-icon {
+            font-size: 18px;
+            color: #888;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .setting-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .setting-main { font-size: 13px; color: #ddd; }
+        .setting-sub { font-size: 11px; color: #888; }
+        
+        .setting-action {
+            color: #888;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .setting-action:hover { color: white; }
+        
+        .setting-link {
+            color: #fa1e4e;
+            text-decoration: none;
+            font-size: 12px;
+            margin-right: 15px;
+        }
+        .setting-link:hover { text-decoration: underline; }
+
+        .setting-inset {
+            background-color: #0b0b0f;
+            border-top: 1px solid #1a1a24;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .inset-row {
+            padding: 12px 20px 12px 55px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #ccc;
+            border-bottom: 1px solid #1a1a24;
+        }
+        .inset-row:last-child { border-bottom: none; }
+        
+        .info-box {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            background-color: #0b0b0f;
+            border: 1px solid #1a1a24;
+            border-radius: 8px;
+            margin: 20px 0;
+            align-items: center;
+        }
+        .info-text { font-size: 12px; color: #888; flex: 1; line-height: 1.5; }
+        
+        /* Advanced Sync Settings */
+        .sync-header { font-size: 15px; font-weight: bold; letter-spacing: 1px; color: #ccc; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; text-transform: uppercase; cursor: pointer; }
+        .sync-header:hover { color: white; }
+        .sync-subtext { font-size: 13px; color: #ccc; margin-bottom: 30px; }
+        
+        .sync-radio-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 13px; color: #ccc; cursor: pointer; }
+        .custom-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #888; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
+        .custom-radio.active { border-color: #fa1e4e; }
+        .custom-radio.active::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fa1e4e; }
+        
+        .sync-data-header { font-size: 13px; font-weight: bold; color: #ddd; margin-top: 30px; margin-bottom: 10px; }
+        
+        .sync-list { margin-left: 35px; display: flex; flex-direction: column; margin-bottom: 20px; }
+        .sync-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #1a1a24; font-size: 13px; color: #ccc; }
+        .sync-list-item:last-child { border-bottom: none; }
+        
+        .sync-toggle { opacity: 1; transition: opacity 0.2s; }
+        .sync-toggle.disabled { opacity: 0.3; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="menu-item">BASIC</div>
+        <div class="menu-item">APPEARANCE</div>
+        <div class="menu-item">ANTIGRAVITY CORE</div>
+        <div class="menu-item">SYNCHRONIZATION</div>
+        <div class="menu-item active">PRIVACY & SECURITY</div>
+        <div class="menu-item">AUTOFILL</div>
+        <div class="menu-item">SEARCH ENGINE</div>
+        <div class="menu-item">DEFAULT BROWSER</div>
+        <div class="menu-item">SYSTEM</div>
+    </div>
+
+    <div class="top-nav">
+        <div>PLUGINS</div>
+        <div>HISTORY</div>
+        <div>DOWNLOADS</div>
+        <div class="active">SETTINGS</div>
+        <div>LABS</div>
+        <div>BOOKMARKS</div>
+        <div>EXTENSIONS</div>
+    </div>
+
+    <div class="content">
+        <input type="text" class="search-box" placeholder="🔍 Search settings">
+
+        <div class="section-title">BASIC</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">General basic settings will appear here</div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">APPEARANCE</div>
+        <div class="settings-list">
+            <div class="setting-complex-row" style="border-bottom: 1px solid #1a1a24;">
+                <div class="setting-main">Browser Theme Color</div>
+            </div>
+            <div class="theme-grid" style="padding: 15px 20px; display: flex; gap: 20px; border-bottom: 1px solid #1a1a24;">
+                <div class="theme-card active" data-color="#FA1E4E" style="background: linear-gradient(135deg, #1a1a24 0%, #FA1E4E 100%);"></div>
+                <div class="theme-card" data-color="#00FFA3" style="background: linear-gradient(135deg, #1a1a24 0%, #00FFA3 100%);"></div>
+                <div class="theme-card" data-color="#00E5FF" style="background: linear-gradient(135deg, #1a1a24 0%, #00E5FF 100%);"></div>
+                <div class="theme-card" data-color="#B142FE" style="background: linear-gradient(135deg, #1a1a24 0%, #B142FE 100%);"></div>
+                <div class="theme-card" data-color="#FFDD00" style="background: linear-gradient(135deg, #1a1a24 0%, #FFDD00 100%);"></div>
+                <div class="theme-card" data-color="#FF6A00" style="background: linear-gradient(135deg, #1a1a24 0%, #FF6A00 100%);"></div>
+            </div>
+
+            <div class="setting-complex-row">
+                <div class="setting-text">
+                    <span class="setting-main">Force Dark Pages</span>
+                    <span class="setting-sub">Force dark themes on websites that do not support it natively</span>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <div class="toggle" id="toggle-force-dark"></div>
+                </div>
+            </div>
+
+            <div class="setting-complex-row">
+                <div class="setting-text">
+                    <span class="setting-main">Experimental Shaders</span>
+                    <span class="setting-sub">Apply CSS/WebGL visual effects to all webpages</span>
+                </div>
+                <select class="select-box" id="select-shader" style="margin-left: 20px;">
+                    <option value="none">None</option>
+                    <option value="crt">Retro CRT Monitor</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">ANTIGRAVITY CORE</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">Browser core features and optimizations</div>
+                <div style="display:flex; align-items:center;">
+                    <div class="toggle on"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVANCED SYNC SETTINGS -->
+        <div id="advanced-sync-view" style="display: block; max-width: 600px; margin-bottom: 50px;">
+            <div class="sync-header">
+                <span>←</span> ADVANCED SYNC SETTINGS
+            </div>
+            
+            <div class="sync-subtext">Exit this page to apply changes</div>
+            
+            <div class="sync-radio-row" onclick="setSyncMode('everything')">
+                <div class="custom-radio active" id="radio-everything"></div>
+                <span>Sync everything</span>
+            </div>
+            <div class="sync-radio-row" onclick="setSyncMode('customize')">
+                <div class="custom-radio" id="radio-customize"></div>
+                <span>Customize sync</span>
+            </div>
+            <div class="sync-radio-row" onclick="setSyncMode('none')">
+                <div class="custom-radio" id="radio-none"></div>
+                <span>Do not sync data</span>
+            </div>
+            
+            <div class="sync-data-header">Sync data</div>
+            <div class="sync-list">
+                <div class="sync-list-item">
+                    <span>History</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span>Bookmarks</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span>Pinboards</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span>Open tabs <span style="color:#888; margin-left:5px;">ⓘ</span></span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span>Passwords</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span>Settings</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+                <div class="sync-list-item">
+                    <span style="border-bottom:none;">Extensions</span>
+                    <div class="toggle on sync-toggle disabled"></div>
+                </div>
+            </div>
+            
+            <div class="setting-complex-row" style="padding: 15px 0; border-top: 1px solid #1a1a24; cursor: pointer;">
+                <span class="setting-main" style="color: #ccc;">Encryption options</span>
+                <span class="setting-action">˅</span>
+            </div>
+        </div>
+
+        <div class="section-title">AUTOFILL</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">🔑</span>
+                    <span class="setting-main">Password Manager</span>
+                </div>
+                <div class="setting-action">↗</div>
+            </div>
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">💳</span>
+                    <span class="setting-main">Payment methods</span>
+                </div>
+                <div class="setting-action">→</div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-text">
+                    <span class="setting-main">Send "Do Not Track" request</span>
+                    <span class="setting-sub">Request websites not to collect or track your browsing data</span>
+                </div>
+                <div class="toggle" id="toggle-dnt"></div>
+            </div>
+
+            <div class="setting-complex-row" style="margin-top: 30px; border: 1px solid #FA1E4E; border-radius: 8px; padding: 20px; background: rgba(250, 30, 78, 0.05);">
+                <div class="setting-text">
+                    <span class="setting-main" style="color: #FA1E4E;">Danger Zone: Wipe & Fake History</span>
+                    <span class="setting-sub">Permanently delete your real browsing history and instantly inject 50+ fake entries of highly productive programming/academic websites into your database. This action cannot be undone.</span>
+                </div>
+                <button class="settings-btn" id="btn-fake-history" style="background: #FA1E4E; border: none; font-weight: bold; padding: 8px 16px;">Inject Fake History</button>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">BLOCKERS</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">Block ads and surf the web up to three times faster</div>
+                <div style="display:flex; align-items:center;">
+                    <a href="#" class="setting-link">Learn more</a>
+                    <div class="toggle on"></div>
+                </div>
+            </div>
+            <div class="setting-inset">
+                <div class="inset-row">
+                    <span>Manage exceptions</span>
+                    <span class="setting-action">→</span>
+                </div>
+                <div class="inset-row">
+                    <span>Manage lists</span>
+                    <span class="setting-action">→</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">Block trackers</div>
+                <div style="display:flex; align-items:center;">
+                    <a href="#" class="setting-link">Learn more</a>
+                    <div class="toggle on"></div>
+                </div>
+            </div>
+            <div class="setting-inset">
+                <div class="inset-row">
+                    <span>Manage exceptions</span>
+                    <span class="setting-action">→</span>
+                </div>
+                <div class="inset-row">
+                    <span>Manage lists</span>
+                    <span class="setting-action">→</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">PRIVACY AND SECURITY</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">🗑️</span>
+                    <div class="setting-text">
+                        <span class="setting-main">Delete browsing data <a href="#" class="setting-link" style="margin-left: 10px;">Learn more</a></span>
+                        <span class="setting-sub">Delete history, cookies, cache, and more</span>
+                    </div>
+                </div>
+                <span class="setting-action">→</span>
+            </div>
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">🍪</span>
+                    <div class="setting-text">
+                        <span class="setting-main">Third-party cookies</span>
+                        <span class="setting-sub">Third-party cookies are allowed</span>
+                    </div>
+                </div>
+                <span class="setting-action">→</span>
+            </div>
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">🔒</span>
+                    <div class="setting-text">
+                        <span class="setting-main">Security</span>
+                        <span class="setting-sub">Protection from malicious sites and other security settings</span>
+                    </div>
+                </div>
+                <span class="setting-action">→</span>
+            </div>
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon">🎛️</span>
+                    <div class="setting-text">
+                        <span class="setting-main">Site settings</span>
+                        <span class="setting-sub">Controls what information sites can use and show (location, camera, pop-ups, and more)</span>
+                    </div>
+                </div>
+                <span class="setting-action">→</span>
+            </div>
+            <div class="setting-complex-row">
+                <div class="setting-left">
+                    <span class="setting-icon"></span>
+                    <div class="setting-text">
+                        <span class="setting-main">Privacy consent settings</span>
+                        <span class="setting-sub">Manage your privacy to create your own personal browsing experience</span>
+                    </div>
+                </div>
+                <span class="setting-action">→</span>
+            </div>
+            
+            <div class="setting-inset">
+                <div class="info-box" style="margin: 0; border: none; border-bottom: 1px solid #1a1a24; border-radius: 0;">
+                    <span class="setting-icon">ⓘ</span>
+                    <span class="info-text" style="color: #888;">Antigravity may use web services to improve your browsing experience. You may optionally disable these services.</span>
+                </div>
+                
+                <div class="setting-complex-row" style="background-color: #14141d; padding-left: 55px;">
+                    <span class="setting-main">Automatically send crash reports to Antigravity</span>
+                    <div style="display:flex; align-items:center;">
+                        <a href="#" class="setting-link">Learn more</a>
+                        <div class="toggle on"></div>
+                    </div>
+                </div>
+                <div class="setting-complex-row" style="background-color: #14141d; padding-left: 55px;">
+                    <span class="setting-main">Help improve Antigravity by sending feature usage information</span>
+                    <div style="display:flex; align-items:center;">
+                        <a href="#" class="setting-link">Learn more</a>
+                        <div class="toggle on"></div>
+                    </div>
+                </div>
+                <div class="setting-complex-row" style="background-color: #14141d; padding-left: 55px;">
+                    <span class="setting-main">Fetch images for suggested sources in News, based on history</span>
+                    <div style="display:flex; align-items:center;">
+                        <div class="toggle on"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">SEARCH ENGINE</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">Search engine used in the address bar</div>
+                <select class="select-box" style="margin-left: 20px;">
+                    <option>Google Search</option>
+                    <option>DuckDuckGo</option>
+                    <option>Bing</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">DEFAULT BROWSER</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-text">
+                    <span class="setting-main">Make Antigravity your default browser</span>
+                    <span class="setting-sub">Currently not the default browser</span>
+                </div>
+                <button style="background: #2a2a35; border: 1px solid #3a3a45; color: white; padding: 6px 15px; border-radius: 4px; cursor: pointer;">Make Default</button>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 40px;">SYSTEM</div>
+        <div class="settings-list">
+            <div class="setting-complex-row">
+                <div class="setting-main">Import bookmarks and settings</div>
+                <div style="display:flex; align-items:center;">
+                    <button class="setting-link" style="background:transparent; border:none; cursor:pointer;" onclick="document.getElementById('import-modal').style.display='flex'">Import...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal Overlay -->
+    <div id="import-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#1a1a24; padding:25px; border-radius:8px; width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.5); display:flex; flex-direction:column; gap:15px; border:1px solid #2a2a35;">
+            <div style="font-size:18px; font-weight:bold; color:white;">Import bookmarks and settings</div>
+            
+            <div style="margin-top:10px;">
+                <span style="font-size:13px; color:#ccc;">From:</span>
+                <select class="select-box" style="width:100%; margin-top:5px; background:#0b0b0f; border:1px solid #2a2a35; color:white; padding:10px; border-radius:4px;">
+                    <option>Microsoft Edge</option>
+                    <option>Google Chrome</option>
+                    <option>Mozilla Firefox</option>
+                    <option>Bookmarks HTML File</option>
+                    <option>JSON Data Archive</option>
+                </select>
+            </div>
+            
+            <div style="font-size:13px; color:#ccc; margin-top:10px;">Select items to import:</div>
+            
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Browsing history</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Favorites/Bookmarks</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Saved passwords 🔑</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Cookies and site data 🍪</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Google Accounts 🌐</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#fa1e4e;">
+                <span style="font-size:13px; color:white;">Location data 📍</span>
+            </label>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+                <button onclick="document.getElementById('import-modal').style.display='none'" style="background:transparent; border:1px solid #555; color:#ccc; padding:8px 15px; border-radius:4px; cursor:pointer;">Cancel</button>
+                <button id="execute-import-btn" style="background:#fa1e4e; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sync Logic
+        function setSyncMode(mode) {
+            document.querySelectorAll('.custom-radio').forEach(r => r.classList.remove('active'));
+            const toggles = document.querySelectorAll('.sync-toggle');
+            
+            if (mode === 'everything') {
+                document.getElementById('radio-everything').classList.add('active');
+                toggles.forEach(t => {
+                    t.classList.add('on');
+                    t.classList.add('disabled');
+                });
+            } else if (mode === 'customize') {
+                document.getElementById('radio-customize').classList.add('active');
+                toggles.forEach(t => t.classList.remove('disabled'));
+            } else if (mode === 'none') {
+                document.getElementById('radio-none').classList.add('active');
+                toggles.forEach(t => {
+                    t.classList.remove('on');
+                    t.classList.add('disabled');
+                });
+            }
+        }
+
+        document.getElementById('execute-import-btn').addEventListener('click', async () => {
+            document.getElementById('execute-import-btn').innerText = 'Importing...';
+            
+            try {
+                // Call Python DPAPI backend
+                const response = await fetch('http://localhost:8000/api/import_browser_data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        browser: 'Google Chrome', // Could be dynamic from the select-box
+                        types: ['passwords', 'cookies']
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('execute-import-btn').innerText = 'Import';
+                
+                if (data.status === 'success') {
+                    let msg = "Import successful!\\n";
+                    if(data.results.passwords && data.results.passwords.count) msg += `- Passwords: ${data.results.passwords.count}\\n`;
+                    if(data.results.cookies && data.results.cookies.count) msg += `- Cookies: ${data.results.cookies.count}\\n`;
+                    alert(msg);
+                    document.getElementById('import-modal').style.display='none';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Import Failed: ' + e.message);
+                document.getElementById('execute-import-btn').innerText = 'Import';
+            }
+        });
+
+        document.querySelectorAll('.toggle').forEach(t => {
+            t.addEventListener('click', () => t.classList.toggle('on'));
+        });
+        document.querySelectorAll('.theme-card').forEach(c => {
+            c.addEventListener('click', () => {
+                document.querySelectorAll('.theme-card').forEach(card => card.classList.remove('active'));
+                c.classList.add('active');
+                if (window.electronAPI && window.electronAPI.setTheme) {
+                    window.electronAPI.setTheme('custom', c.getAttribute('data-color'));
+                }
+            });
+        });
+
+        // Setup Shaders and Force Dark bindings
+        const toggleForceDark = document.getElementById('toggle-force-dark');
+        if (toggleForceDark) {
+            toggleForceDark.addEventListener('click', () => {
+                const isActive = toggleForceDark.classList.contains('on');
+                if (window.electronAPI && window.electronAPI.toggleForceDark) {
+                    window.electronAPI.toggleForceDark(isActive);
+                }
+            });
+        }
+
+        const btnImportHistory = document.getElementById('btn-import-history');
+        if (btnImportHistory) {
+            btnImportHistory.addEventListener('click', async () => {
+                if (window.electronAPI && window.electronAPI.importHistory) {
+                    await window.electronAPI.importHistory();
+                    alert('History import attempted.');
+                }
+            });
+        }
+        
+        const btnFakeHistory = document.getElementById('btn-fake-history');
+        if (btnFakeHistory) {
+            btnFakeHistory.addEventListener('click', () => {
+                if (confirm("Are you sure? This will PERMANENTLY wipe your real history and replace it with fake productive entries.")) {
+                    if (window.electronAPI && window.electronAPI.fakeHistory) {
+                        window.electronAPI.fakeHistory();
+                        alert('Your history has been successfully faked. It is now filled with AWS, LeetCode, and Wikipedia links.');
+                    }
+                }
+            });
+        }
+
+        const selectShader = document.getElementById('select-shader');
+        if (selectShader) {
+            selectShader.addEventListener('change', (e) => {
+                if (window.electronAPI && window.electronAPI.setShader) {
+                    window.electronAPI.setShader(e.target.value);
+                }
+            });
+        }
+        
+        // Top Nav Interactions
+        document.querySelectorAll('.top-nav div').forEach(tab => {
+            tab.addEventListener('click', (ev) => {
+                document.querySelectorAll('.top-nav div').forEach(t => t.classList.remove('active'));
+                ev.target.classList.add('active');
+            });
+        });
+
+        // Sidebar Menu Logic
+        document.querySelectorAll('.sidebar .menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Update active state
+                document.querySelectorAll('.sidebar .menu-item').forEach(m => m.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Handle Sidebar clicks
+                const targetText = item.innerText.trim();
+                const sectionTitles = document.querySelectorAll('.section-title');
+                
+                // Special mapping
+                let searchStr = targetText;
+                if (targetText === 'BASIC') searchStr = 'THEMES';
+                if (targetText === 'SYNCHRONIZATION') {
+                    // Scroll to top or advanced sync
+                    const syncView = document.getElementById('advanced-sync-view');
+                    if (syncView) {
+                        syncView.scrollIntoView({ behavior: 'smooth' });
+                        return;
+                    }
+                }
+                
+                for (const title of sectionTitles) {
+                    if (title.innerText.trim() === searchStr) {
+                        title.scrollIntoView({ behavior: 'smooth' });
+                        break;
+                    }
+                }
+            });
+        });
+        
+        if (window.electronAPI && window.electronAPI.onThemeChanged) {
+            window.electronAPI.onThemeChanged((e, color) => {
+                document.documentElement.style.setProperty('--accent', color);
+                document.querySelectorAll('.theme-card').forEach(card => card.classList.remove('active'));
+                const activeCard = document.querySelector(`.theme-card[data-color="${color}"]`);
+                if(activeCard) activeCard.classList.add('active');
+            });
+        }
+        
+        // Settings Search Functionality
+        const searchBox = document.querySelector('.search-box');
+        if (searchBox) {
+            searchBox.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                
+                // Filter standard setting rows
+                document.querySelectorAll('.setting-complex-row').forEach(row => {
+                    // Don't filter the inner encryption dropdown in advanced sync for now
+                    if (row.parentElement.id === 'advanced-sync-view' && row.innerText.includes('Encryption')) return;
+                    
+                    const text = row.innerText.toLowerCase();
+                    // Some rows are display block or flex, let's just reset to empty string which reverts to css class default, or none
+                    if (text.includes(term)) {
+                        row.style.display = ''; 
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Filter Sync items
+                document.querySelectorAll('.sync-list-item').forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    if (text.includes(term)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

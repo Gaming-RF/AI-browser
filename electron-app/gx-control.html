@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GX Control</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #14141d; color: white; }
+        .header { font-size: 32px; text-align: center; margin-bottom: 10px; }
+        .title { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #00E5FF; }
+        .card { background: #1a1a24; border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 15px; }
+        .tab-title { font-weight: bold; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .toggle { width: 36px; height: 18px; background-color: #333; border-radius: 9px; position: relative; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
+        .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle.on { background-color: #00E5FF; }
+        .toggle.on::after { transform: translateX(18px); }
+    </style>
+</head>
+<body>
+    <div class="header">🏎️</div>
+    <div class="title">Resource Governance</div>
+    <div id="gx-tabs-list"></div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('update-tabs', (e, tabs) => {
+            const list = document.getElementById('gx-tabs-list');
+            list.innerHTML = '';
+            if (tabs.length === 0) {
+                list.innerHTML = '<div style="color:#888; text-align:center;">No active tabs</div>';
+                return;
+            }
+
+            tabs.forEach(tab => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.innerHTML = `
+                    <div class="tab-title">${tab.title || tab.url}</div>
+                    <div class="row">
+                        <span>Eco Mode (Limit CPU)</span>
+                        <div class="toggle gx-toggle-eco" data-id="${tab.id}"></div>
+                    </div>
+                    <div class="row">
+                        <span>Cryo Freeze (0% CPU)</span>
+                        <div class="toggle gx-toggle-cryo" data-id="${tab.id}"></div>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+
+            document.querySelectorAll('.gx-toggle-eco').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    btn.classList.toggle('on');
+                    const isEco = btn.classList.contains('on');
+                    ipcRenderer.invoke('apply-resource-limit', { tabId: id, action: isEco ? 'limit_cpu' : 'normal' });
+                });
+            });
+
+            document.querySelectorAll('.gx-toggle-cryo').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    btn.classList.toggle('on');
+                    const isCryo = btn.classList.contains('on');
+                    
+                    if (isCryo) {
+                        btn.closest('.card').style.opacity = '0.5';
+                        ipcRenderer.invoke('apply-resource-limit', { tabId: id, action: 'suspend' });
+                    } else {
+                        btn.closest('.card').style.opacity = '1';
+                        ipcRenderer.invoke('apply-resource-limit', { tabId: id, action: 'resume' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
