@@ -113,6 +113,7 @@ function createTab(url = null, parentTabId = null, isIncognito = false) {
     });
     
     view.webContents.on('did-finish-load', () => {
+        if (view.webContents.isDestroyed()) return;
         const isActive = (activeTabId === tabId);
         view.webContents.executeJavaScript(`window.__isActiveTab = ${isActive};`).catch(() => {});
         
@@ -126,6 +127,7 @@ function createTab(url = null, parentTabId = null, isIncognito = false) {
     });
     
     view.webContents.on('page-title-updated', (e, title) => {
+        if (view.webContents.isDestroyed()) return;
         const tab = tabs.get(tabId);
         if (tab) {
             tab.title = title;
@@ -135,7 +137,9 @@ function createTab(url = null, parentTabId = null, isIncognito = false) {
                 saveHistory();
             }
         }
-        mainWindow.webContents.send('tabs-updated', getTabsState());
+        if (!mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('tabs-updated', getTabsState());
+        }
     });
 
     view.webContents.loadURL(url);
@@ -261,6 +265,7 @@ function resizeView() {
 function applyShader(targetTabId, shaderType) {
     if (!tabs.has(targetTabId)) return;
     const webContents = tabs.get(targetTabId).view.webContents;
+    if (webContents.isDestroyed()) return;
     
     let css = '';
     if (shaderType === 'dark') {
@@ -325,6 +330,13 @@ function initSidebarPanel(id) {
     
     sidebarPanels.set(id, view);
     return view;
+}
+
+function initSidebarPanels() {
+    const panels = ['ai', 'discord', 'twitch', 'whatsapp', 'player', 'gx-control'];
+    for (const id of panels) {
+        initSidebarPanel(id);
+    }
 }
 
 function createWindow() {

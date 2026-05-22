@@ -90,10 +90,18 @@ body {
 
 .gx-logo {
     color: var(--accent);
-    font-weight: 900;
-    font-size: 24px;
     margin-bottom: 20px;
     -webkit-app-region: no-drag;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gx-logo svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
 }
 
 .gx-icons {
@@ -116,10 +124,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
-    font-size: 14px;
+}
+
+.gx-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    display: block;
 }
 
 .gx-icon:hover {
