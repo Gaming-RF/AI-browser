@@ -126,6 +126,7 @@ class AIBrowser:
         step = 0
         last_action_result: Optional[str] = None
         active_task = task_description
+        current_screenshot_bytes = None
 
         try:
             while step < self.max_steps:
@@ -164,10 +165,12 @@ class AIBrowser:
                 # ── 3. Optionally capture screenshot for AI ─
                 screenshot_for_ai = None
                 if self.vision_mode:
-                    try:
-                        screenshot_for_ai = await self.browser.screenshot()
-                    except Exception:
-                        screenshot_for_ai = None
+                    if current_screenshot_bytes is None:
+                        try:
+                            current_screenshot_bytes = await self.browser.screenshot()
+                        except Exception:
+                            current_screenshot_bytes = None
+                    screenshot_for_ai = current_screenshot_bytes
 
                 # ── 4. Notify: thinking ────────────────────
                 if self._on_step_async:
@@ -188,9 +191,13 @@ class AIBrowser:
                 screenshot_b64 = None
                 try:
                     if self.browser.page:
-                        screenshot_b64 = await self.browser.screenshot_base64()
+                        # Capture fresh screenshot after action
+                        current_screenshot_bytes = await self.browser.screenshot()
+                        import base64
+                        screenshot_b64 = base64.b64encode(current_screenshot_bytes).decode("utf-8")
                 except Exception:
                     screenshot_b64 = None
+                    current_screenshot_bytes = None
 
                 # ── 8. Fire progress callbacks ─────────────
                 step_info = {
@@ -348,7 +355,7 @@ FORMAT YOUR RESPONSE AS A JSON OBJECT:
     "next_steps": "What you plan to do next"
 }}
 
-If the task is complete, respond with:
+If the task is complete, you MUST first verify the results on the page. Check for any errors, bugs, or missing elements. If issues are found, fix them before completing. Once thoroughly verified, respond with:
 {{"status": "completed", "result": "Summary of what was accomplished"}}
 
 If an action failed, analyze the error and try a different approach.

@@ -161,7 +161,7 @@ class BrowserController:
         if not self.page:
             raise RuntimeError("Browser not initialized. Call initialize() first.")
 
-        await self.page.goto(url, wait_until="networkidle")
+        await self.page.goto(url, wait_until="load")
         action = BrowserAction(action_type="navigate", url=url)
         self.action_history.append(action)
         return f"Navigated to {url}"
@@ -171,7 +171,7 @@ class BrowserController:
         if not self.page:
             raise RuntimeError("Browser not initialized. Call initialize() first.")
 
-        await self.page.go_back(wait_until="networkidle")
+        await self.page.go_back(wait_until="load")
         action = BrowserAction(action_type="go_back")
         self.action_history.append(action)
         return "Navigated back"
@@ -181,7 +181,7 @@ class BrowserController:
         if not self.page:
             raise RuntimeError("Browser not initialized. Call initialize() first.")
 
-        await self.page.go_forward(wait_until="networkidle")
+        await self.page.go_forward(wait_until="load")
         action = BrowserAction(action_type="go_forward")
         self.action_history.append(action)
         return "Navigated forward"

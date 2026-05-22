@@ -250,6 +250,20 @@
         `;
         chatArea.appendChild(msg);
         scrollToBottom();
+
+        // System Notification
+        const notifBody = "Task Completed: " + (data.result || "Done!");
+        if (typeof Notification !== "undefined") {
+            if (Notification.permission === "granted") {
+                new Notification("AI Browser Agent", { body: notifBody });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("AI Browser Agent", { body: notifBody });
+                    }
+                });
+            }
+        }
     }
 
     function renderErrorMessage(data) {
