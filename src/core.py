@@ -127,6 +127,7 @@ class AIBrowser:
         last_action_result: Optional[str] = None
         active_task = task_description
         current_screenshot_bytes = None
+        dom_length_history = []
 
         try:
             while step < self.max_steps:
@@ -156,6 +157,23 @@ class AIBrowser:
 
                 # ── 1. Observe ─────────────────────────────
                 context = await self._get_current_context()
+                
+                # ── Check for Stuck Loops (DOM Delta) ──────
+                curr_len = len(context.get("page_dom", ""))
+                dom_length_history.append(curr_len)
+                if len(dom_length_history) > 3:
+                    dom_length_history.pop(0)
+                
+                if len(dom_length_history) == 3:
+                    max_len = max(dom_length_history)
+                    min_len = min(dom_length_history)
+                    if max_len > 0 and (max_len - min_len) / max_len < 0.02:
+                        if last_action_result:
+                            # Inject automated stuck warning
+                            stuck_warning = "SYSTEM WARNING: The page state has barely changed (<2%) across the last 3 turns. You are stuck in a loop. Try a completely different approach, stop interacting with the same broken element, or evaluate if the task is impossible."
+                            last_action_result = json.dumps({"previous_result": last_action_result, "system_intervention": stuck_warning})
+                        # Clear history so we don't spam the warning every step
+                        dom_length_history.clear()
 
                 # ── 2. Build prompt ────────────────────────
                 prompt = self._build_prompt(
@@ -285,6 +303,15 @@ class AIBrowser:
             try:
                 raw_html = await self.browser.get_content()
                 page_dom = clean_html(raw_html)
+                
+                # Append pure semantic A11y tree
+                try:
+                    from src.browser.dom_helper import format_a11y_tree
+                    raw_a11y = await self.browser.get_a11y_tree()
+                    a11y_str = format_a11y_tree(raw_a11y)
+                    page_dom += "\n\nACCESSIBILITY TREE (SEMANTIC STRUCTURE):\n" + a11y_str
+                except Exception as e:
+                    print(f"Warning: A11y tree extraction failed: {e}")
             except Exception:
                 page_dom = "(could not read page)"
 

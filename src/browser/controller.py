@@ -99,17 +99,25 @@ class BrowserController:
                 
         except Exception as e:
             print(f"Could not connect to Electron CDP (is the app running?): {e}")
-            # Fallback to launching a fresh headless browser
-            self.browser = await self.playwright.chromium.launch(
+            import os
+            # Fallback to launching a persistent context with stealth
+            user_data_dir = os.path.join(os.getcwd(), "browser_data")
+            self.browser = await self.playwright.chromium.launch_persistent_context(
+                user_data_dir,
                 headless=self.headless,
                 slow_mo=self.slow_mo,
-            )
-            self.page = await self.browser.new_page(
                 viewport={
                     "width": self.viewport_width,
                     "height": self.viewport_height,
                 }
             )
+            self.page = self.browser.pages[0] if self.browser.pages else await self.browser.new_page()
+            
+            try:
+                from playwright_stealth import stealth_async
+                await stealth_async(self.page)
+            except ImportError:
+                print("playwright-stealth not installed, skipping stealth mode.")
         
         cursor_script = """
             if (!document.getElementById('ai-virtual-cursor')) {
@@ -274,6 +282,16 @@ class BrowserController:
         action = BrowserAction(action_type="get_content")
         self.action_history.append(action)
         return content
+
+    async def get_a11y_tree(self) -> dict:
+        """Get the Accessibility Tree (semantic representation)."""
+        if not self.page:
+            raise RuntimeError("Browser not initialized. Call initialize() first.")
+
+        tree = await self.page.accessibility.snapshot()
+        action = BrowserAction(action_type="get_a11y_tree")
+        self.action_history.append(action)
+        return tree
 
     async def screenshot(self, path: Optional[str] = None) -> bytes:
         """Take a screenshot."""

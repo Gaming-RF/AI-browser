@@ -149,3 +149,30 @@ def _build_selector(tag: "Tag") -> str:
         parts.append(f'[aria-label="{aria}"]')
 
     return "".join(parts)
+
+
+def format_a11y_tree(node: dict, indent: int = 0) -> str:
+    """Recursively format a Playwright accessibility tree node into a string."""
+    if not node:
+        return ""
+    
+    role = node.get("role", "")
+    name = node.get("name", "")
+    
+    # Skip generic structural nodes without names if they clutter
+    if role in ["generic", "none", "presentation"] and not name:
+        lines = []
+    else:
+        prefix = "  " * indent
+        line = f"{prefix}* {role}"
+        if name:
+            line += f": '{name}'"
+        lines = [line]
+        indent += 1
+        
+    for child in node.get("children", []):
+        child_str = format_a11y_tree(child, indent)
+        if child_str:
+            lines.append(child_str)
+            
+    return "\n".join(lines)
