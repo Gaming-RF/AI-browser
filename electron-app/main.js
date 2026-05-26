@@ -627,6 +627,39 @@ function createWindow() {
         }
     });
 
+    ipcMain.on('inject-user-script', (e, { tabId, script }) => {
+        const targetId = tabId || activeTabId;
+        if (!targetId || !tabs.has(targetId)) return;
+        const view = tabs.get(targetId).view;
+        view.webContents.executeJavaScriptInIsolatedWorld(1, [{ code: script }])
+            .then(() => console.log(`Injected script into tab ${targetId}`))
+            .catch(err => console.error("Script Injection Error:", err));
+    });
+
+    ipcMain.on('inject-custom-css', (e, { tabId, css }) => {
+        const targetId = tabId || activeTabId;
+        if (!targetId || !tabs.has(targetId)) return;
+        const view = tabs.get(targetId).view;
+        view.webContents.insertCSS(css)
+            .then(key => console.log(`Injected CSS into tab ${targetId} with key ${key}`))
+            .catch(err => console.error("CSS Injection Error:", err));
+    });
+
+    ipcMain.on('set-proxy', async (e, proxyRules) => {
+        const { session } = require('electron');
+        try {
+            if (proxyRules) {
+                await session.defaultSession.setProxy({ proxyRules });
+                console.log(`Proxy set to: ${proxyRules}`);
+            } else {
+                await session.defaultSession.setProxy({ proxyRules: '' });
+                console.log(`Proxy disabled (direct connection)`);
+            }
+        } catch (err) {
+            console.error("Failed to set proxy:", err);
+        }
+    });
+
     ipcMain.handle('import-history', async () => {
         try {
             const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -667,13 +700,62 @@ app.whenReady().then(() => {
 
     // Start Ad Blocker
     const { session } = require('electron');
+    let globalBlockAds = true;
+    let globalBlockTrackers = true;
+    let adBlockerInstance = null;
+
+    function applyBlockerState() {
+        if (!adBlockerInstance) return;
+        if (globalBlockAds || globalBlockTrackers) {
+             adBlockerInstance.enableBlockingInSession(session.defaultSession);
+             console.log("Ad/Tracker Blocker Enabled");
+        } else {
+             adBlockerInstance.disableBlockingInSession(session.defaultSession);
+             console.log("Ad/Tracker Blocker Disabled");
+        }
+    }
+
     ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
-        blocker.enableBlockingInSession(session.defaultSession);
+        adBlockerInstance = blocker;
+        applyBlockerState();
         app.on('session-created', (newSession) => {
-            blocker.enableBlockingInSession(newSession);
+            if (globalBlockAds || globalBlockTrackers) {
+                blocker.enableBlockingInSession(newSession);
+            }
         });
-        console.log("Ad Blocker Activated");
+        console.log("Ad Blocker Engine Initialized");
     }).catch(err => console.error("Ad Blocker Error:", err));
+
+    ipcMain.on('set-block-ads', (e, enabled) => {
+        globalBlockAds = enabled;
+        applyBlockerState();
+    });
+
+    ipcMain.on('set-block-trackers', (e, enabled) => {
+        globalBlockTrackers = enabled;
+        applyBlockerState();
+    });
+
+    let globalDoNotTrack = false;
+    ipcMain.on('set-do-not-track', (e, enabled) => {
+        globalDoNotTrack = enabled;
+    });
+
+    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+        if (globalDoNotTrack) {
+            details.requestHeaders['DNT'] = '1';
+        }
+        callback({ requestHeaders: details.requestHeaders });
+    });
+
+    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+        // Enforce strict firewall for privacy
+        // In a fully featured app, this would query a user allowlist or prompt
+        console.log(`Permission requested: ${permission}`);
+        // Deny all by default for maximum security, or allow based on user config.
+        // We'll deny for now to maintain absolute control.
+        callback(false);
+    });
 
     // Download Manager Hook
     session.defaultSession.on('will-download', (event, item, webContents) => {
