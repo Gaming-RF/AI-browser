@@ -53,6 +53,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openSettings: () => ipcRenderer.send('open-settings'),
     importHistory: () => ipcRenderer.invoke('import-history'),
     clearBrowsingData: () => ipcRenderer.send('clear-browsing-data'),
+    setBlockAds: (enabled) => ipcRenderer.send('set-block-ads', enabled),
+    setBlockTrackers: (enabled) => ipcRenderer.send('set-block-trackers', enabled),
+    setDoNotTrack: (enabled) => ipcRenderer.send('set-do-not-track', enabled),
+    injectUserScript: (tabId, script) => ipcRenderer.send('inject-user-script', { tabId, script }),
+    injectCustomCss: (tabId, css) => ipcRenderer.send('inject-custom-css', { tabId, css }),
+    setProxy: (proxyRules) => ipcRenderer.send('set-proxy', proxyRules),
     
     // Resource Limits
     applyResourceLimit: (tabId, action) => ipcRenderer.invoke('apply-resource-limit', { tabId, action })

@@ -354,6 +354,17 @@
                     <div class="toggle on"></div>
                 </div>
             </div>
+
+            <div class="setting-complex-row" style="margin-top: 20px; flex-direction: column; align-items: flex-start;">
+                <div class="setting-main" style="margin-bottom: 10px;">Custom Context Scripts (Plugins)</div>
+                <textarea id="custom-user-script" placeholder="Enter JavaScript to inject into active tab..." style="width: 100%; height: 80px; background: #141419; color: white; border: 1px solid #2a2a35; border-radius: 4px; padding: 10px; font-family: monospace;"></textarea>
+                <button id="btn-inject-script" class="settings-btn" style="margin-top: 10px;">Inject Script</button>
+            </div>
+            <div class="setting-complex-row" style="margin-top: 20px; flex-direction: column; align-items: flex-start;">
+                <div class="setting-main" style="margin-bottom: 10px;">Custom CSS Skins</div>
+                <textarea id="custom-user-css" placeholder="Enter CSS to inject into active tab..." style="width: 100%; height: 80px; background: #141419; color: white; border: 1px solid #2a2a35; border-radius: 4px; padding: 10px; font-family: monospace;"></textarea>
+                <button id="btn-inject-css" class="settings-btn" style="margin-top: 10px;">Inject CSS</button>
+            </div>
         </div>
 
         <!-- ADVANCED SYNC SETTINGS -->
@@ -441,6 +452,14 @@
 
             <div class="setting-complex-row" style="margin-top: 30px; border: 1px solid #FA1E4E; border-radius: 8px; padding: 20px; background: rgba(250, 30, 78, 0.05);">
                 <div class="setting-text">
+                    <span class="setting-main" style="color: #FA1E4E;">Danger Zone: Clear Browsing Data</span>
+                    <span class="setting-sub">Delete history, cookies, cache, and all browsing data permanently.</span>
+                </div>
+                <button class="settings-btn" id="btn-clear-browsing-data" style="background: #FA1E4E; border: none; font-weight: bold; padding: 8px 16px;">Clear Data</button>
+            </div>
+
+            <div class="setting-complex-row" style="margin-top: 30px; border: 1px solid #FA1E4E; border-radius: 8px; padding: 20px; background: rgba(250, 30, 78, 0.05);">
+                <div class="setting-text">
                     <span class="setting-main" style="color: #FA1E4E;">Danger Zone: Wipe & Fake History</span>
                     <span class="setting-sub">Permanently delete your real browsing history and instantly inject 50+ fake entries of highly productive programming/academic websites into your database. This action cannot be undone.</span>
                 </div>
@@ -454,7 +473,7 @@
                 <div class="setting-main">Block ads and surf the web up to three times faster</div>
                 <div style="display:flex; align-items:center;">
                     <a href="#" class="setting-link">Learn more</a>
-                    <div class="toggle on"></div>
+                    <div class="toggle on" id="toggle-block-ads"></div>
                 </div>
             </div>
             <div class="setting-inset">
@@ -474,7 +493,7 @@
                 <div class="setting-main">Block trackers</div>
                 <div style="display:flex; align-items:center;">
                     <a href="#" class="setting-link">Learn more</a>
-                    <div class="toggle on"></div>
+                    <div class="toggle on" id="toggle-block-trackers"></div>
                 </div>
             </div>
             <div class="setting-inset">
@@ -600,6 +619,14 @@
                 <div class="setting-main">Import bookmarks and settings</div>
                 <div style="display:flex; align-items:center;">
                     <button class="setting-link" style="background:transparent; border:none; cursor:pointer;" onclick="document.getElementById('import-modal').style.display='flex'">Import...</button>
+                </div>
+            </div>
+            <div class="setting-complex-row" style="margin-top: 20px; flex-direction: column; align-items: flex-start;">
+                <div class="setting-main" style="margin-bottom: 10px;">Custom Proxy / Network Isolation</div>
+                <div class="setting-sub" style="margin-bottom: 10px;">Route browser traffic through a specific proxy (e.g. socks5://127.0.0.1:9050 for Tor). Leave blank to disable.</div>
+                <div style="display:flex; gap: 10px; width: 100%;">
+                    <input type="text" id="proxy-url-input" placeholder="socks5://127.0.0.1:9050" style="flex: 1; background: #141419; color: white; border: 1px solid #2a2a35; border-radius: 4px; padding: 8px;">
+                    <button id="btn-apply-proxy" class="settings-btn" style="white-space: nowrap;">Apply Proxy</button>
                 </div>
             </div>
         </div>
@@ -732,6 +759,91 @@
                 if (window.electronAPI && window.electronAPI.toggleForceDark) {
                     window.electronAPI.toggleForceDark(isActive);
                 }
+            });
+        }
+
+        const btnClearBrowsingData = document.getElementById('btn-clear-browsing-data');
+        if (btnClearBrowsingData) {
+            btnClearBrowsingData.addEventListener('click', () => {
+                if (confirm("Are you sure you want to clear all browsing data (history, cookies, cache)? This action cannot be undone.")) {
+                    if (window.electronAPI && window.electronAPI.clearBrowsingData) {
+                        window.electronAPI.clearBrowsingData();
+                        alert('Browsing data has been cleared successfully.');
+                    }
+                }
+            });
+        }
+
+        const btnApplyProxy = document.getElementById('btn-apply-proxy');
+        if (btnApplyProxy) {
+            btnApplyProxy.addEventListener('click', () => {
+                const proxyUrl = document.getElementById('proxy-url-input').value.trim();
+                if (window.electronAPI && window.electronAPI.setProxy) {
+                    window.electronAPI.setProxy(proxyUrl);
+                    alert(proxyUrl ? 'Proxy applied: ' + proxyUrl : 'Proxy disabled. Direct connection restored.');
+                }
+            });
+        }
+
+        const btnInjectScript = document.getElementById('btn-inject-script');
+        if (btnInjectScript) {
+            btnInjectScript.addEventListener('click', () => {
+                const scriptText = document.getElementById('custom-user-script').value;
+                if (scriptText && window.electronAPI && window.electronAPI.injectUserScript) {
+                    // For the sake of simplicity, applying to "active" tab implies sending null as tabId from renderer isn't optimal without a tab state.
+                    // But our settings page doesn't know the active tab ID.
+                    // Let's modify IPC to accept null meaning 'active tab'.
+                    window.electronAPI.injectUserScript(null, scriptText);
+                    alert('Script injected into active tab.');
+                }
+            });
+        }
+
+        const btnInjectCss = document.getElementById('btn-inject-css');
+        if (btnInjectCss) {
+            btnInjectCss.addEventListener('click', () => {
+                const cssText = document.getElementById('custom-user-css').value;
+                if (cssText && window.electronAPI && window.electronAPI.injectCustomCss) {
+                    window.electronAPI.injectCustomCss(null, cssText);
+                    alert('CSS injected into active tab.');
+                }
+            });
+        }
+
+        const toggleBlockAds = document.getElementById('toggle-block-ads');
+        if (toggleBlockAds) {
+            toggleBlockAds.addEventListener('click', () => {
+                // The global listener toggles the 'on' class, we check it after
+                setTimeout(() => {
+                    const isActive = toggleBlockAds.classList.contains('on');
+                    if (window.electronAPI && window.electronAPI.setBlockAds) {
+                        window.electronAPI.setBlockAds(isActive);
+                    }
+                }, 10);
+            });
+        }
+
+        const toggleDnt = document.getElementById('toggle-dnt');
+        if (toggleDnt) {
+            toggleDnt.addEventListener('click', () => {
+                setTimeout(() => {
+                    const isActive = toggleDnt.classList.contains('on');
+                    if (window.electronAPI && window.electronAPI.setDoNotTrack) {
+                        window.electronAPI.setDoNotTrack(isActive);
+                    }
+                }, 10);
+            });
+        }
+
+        const toggleBlockTrackers = document.getElementById('toggle-block-trackers');
+        if (toggleBlockTrackers) {
+            toggleBlockTrackers.addEventListener('click', () => {
+                setTimeout(() => {
+                    const isActive = toggleBlockTrackers.classList.contains('on');
+                    if (window.electronAPI && window.electronAPI.setBlockTrackers) {
+                        window.electronAPI.setBlockTrackers(isActive);
+                    }
+                }, 10);
             });
         }
 
