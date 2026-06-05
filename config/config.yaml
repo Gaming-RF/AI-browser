@@ -1,0 +1,50 @@
+# ============================================================
+# AI Browser Agent - Configuration
+# ============================================================
+# All values here can be overridden by environment variables
+# or a .env file. Environment variables take precedence.
+# ============================================================
+
+# --- AI Provider ---
+# Supported: "openai", "anthropic"
+# For local models (Ollama, LM Studio, vLLM), use "openai"
+# and set api_base_url below.
+ai_provider: "openai"
+
+# --- Model ---
+# Cloud examples:  gpt-4, gpt-4o, gpt-3.5-turbo, claude-3-opus-20240229
+# Local examples:  llama3, mistral, codellama, deepseek-coder
+ai_model: "gpt-4"
+
+# --- API Keys ---
+# Leave blank if using a local model that doesn't require one.
+openai_api_key: ""
+anthropic_api_key: ""
+
+# --- Custom API Base URL (for local / self-hosted models) ---
+# Ollama:     http://localhost:11434/v1
+# LM Studio:  http://localhost:1234/v1
+# vLLM:       http://localhost:8000/v1
+# LiteLLM:    http://localhost:4000/v1
+# Leave empty to use the default cloud endpoint.
+api_base_url: ""
+
+# --- Browser ---
+headless_mode: true
+browser_slow_mo: 0            # milliseconds delay between actions
+viewport_width: 1280
+viewport_height: 900
+
+# --- Execution ---
+max_steps: 15                  # max autonomous actions per task
+task_timeout: 300              # seconds before a task is killed
+max_retries: 3
+
+# --- Vision ---
+# When enabled, the agent receives a screenshot alongside the
+# cleaned DOM at every step.  Requires a vision-capable model
+# (gpt-4o, claude-3-*, llava, etc.).
+vision_mode: false
+
+# --- Memory ---
+memory_db_path: "memory.db"

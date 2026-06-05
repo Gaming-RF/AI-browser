@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI Native Browser</title>
+    <link rel="stylesheet" href="browser.css">
+</head>
+<body>
+
+    <!-- Workspace Sidebar -->
+    <div class="workspace-sidebar" id="workspaceSidebar">
+        <div class="workspace-icon active" data-id="personal" title="Personal Workspace">🏠</div>
+        <div class="workspace-icon" data-id="work" title="Work Workspace">💼</div>
+        <div class="workspace-icon" data-id="gaming" title="Gaming Workspace">🎮</div>
+    </div>
+
+    <div id="app-layout">
+        <nav id="gx-sidebar">
+            <div class="gx-logo" title="Antigravity">
+                <svg viewBox="0 0 24 24"><path d="M12 2C11.5 6 9 12 4 18h4.5c2-2 3-5 3.5-9 .5 4 1.5 7 3.5 9H20c-5-6-7.5-12-8-16z"/><circle cx="12" cy="14" r="2.2"/></svg>
+            </div>
+            
+            <div class="gx-icons top-icons">
+                <div class="gx-icon" title="Discord" style="color: #5865F2;">
+                    <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z"/></svg>
+                </div>
+                <div class="gx-icon" title="Twitch" style="color: #9146FF;">
+                    <svg viewBox="0 0 24 24"><path d="M2.149 0l-1.612 4.119v16.8h5.6v3.081l3.081-3.081h4.2l6.438-6.438v-14.481h-17.707zm15.86 13.081l-3.733 3.733h-4.2l-2.8 2.8v-2.8h-3.267v-14.933h14.001v11.2zm-2.8-7.467h-1.867v4.667h1.867v-4.667zm-4.667 0h-1.867v4.667h1.867v-4.667z"/></svg>
+                </div>
+                <div class="gx-icon" title="WhatsApp" style="color: #25D366;">
+                    <svg viewBox="0 0 24 24"><path d="M12.004 2c-5.518 0-9.996 4.477-9.996 9.995 0 1.764.459 3.486 1.333 5.003L2 22l5.178-1.357c1.474.805 3.128 1.229 4.82 1.229 5.517 0 9.996-4.478 9.996-9.995C22.004 6.477 17.522 2 12.004 2zm6.306 13.784c-.255.72-.88 1.298-1.573 1.637-.624.305-1.378.48-3.037-.21-2.146-.893-3.766-3.023-4.835-4.493-1.042-1.433-1.776-3.076-1.776-4.725 0-1.688.852-2.52 1.688-2.52.32 0 .616.012.833.023.238.012.443.024.636.48.243.576.83 2.029.902 2.174.072.144.12.312.024.504-.096.192-.144.312-.288.48l-.444.528c-.132.144-.276.3-.12.576.156.264.696 1.14 1.488 1.848.816.732 1.548 1.008 1.812 1.14.264.132.42.108.576-.072.156-.18.66-.768.84-.1.18.18 1.14.54 1.332.636.192.096.324.144.372.228.048.084.048.492-.207 1.212z"/></svg>
+                </div>
+                <div class="gx-icon" title="Player" style="color: #F8B400;">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h6V3h-8z"/></svg>
+                </div>
+                <div class="gx-separator"></div>
+                <div class="gx-icon ai-toggle-btn" title="Co-Pilot AI" style="color: var(--accent);">
+                    <svg viewBox="0 0 24 24"><path d="M10 2c-.38 4.22-3.78 7.62-8 8 4.22.38 7.62 3.78 8 8 .38-4.22 3.78-7.62 8-8-4.22-.38-7.62-3.78-8-8zm8 10c-.19 2.11-1.89 3.81-4 4 2.11.19 3.81 1.89 4 4 .19-2.11 1.89-3.81 4-4-2.11-.19-3.81-1.89-4-4z"/></svg>
+                </div>
+            </div>
+            
+            <div class="gx-icons bottom-icons">
+                <div class="gx-icon gx-control-btn" title="GX Control" style="color: #00E5FF;">
+                    <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9c0 2.24.82 4.29 2.18 5.86l1.43-1.43A6.93 6.93 0 0 1 5 12a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 1.66-.58 3.18-1.54 4.39l1.44 1.44A8.93 8.93 0 0 0 21 12a9 9 0 0 0-9-9zm-1 5v5h5v-2h-3V8h-2zm-6.22 9.22l-1.42 1.42C5.07 20.35 7.91 21.6 11 21.94v-2c-2.48-.32-4.73-1.32-6.22-2.72zm14.44 0c-1.49 1.4-3.74 2.4-6.22 2.72v2c3.09-.34 5.93-1.59 7.64-3.3l-1.42-1.42z"/></svg>
+                </div>
+                <div class="gx-icon settings-btn" title="Settings" id="settings-btn" style="color: #8b8598;">
+                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Resize Handle (Invisible, just for dragging) -->
+        <div id="sidebar-resize-handle"></div>
+
+        <!-- Main Content Area -->
+        <main id="main-area">
+            <!-- Horizontal Tabs Bar -->
+            <div id="top-tabs-bar">
+                <div id="tabs-list"></div>
+                <button id="new-tab-btn" class="nav-btn" title="New Tab">+</button>
+                <button id="new-incognito-btn" class="nav-btn" title="New Incognito Tab" style="font-size: 16px;">🕵️</button>
+            </div>
+            
+            <!-- Top Toolbar -->
+            <header id="toolbar">
+                <div class="nav-buttons">
+                    <button id="back-btn">←</button>
+                    <button id="fwd-btn">→</button>
+                    <button id="reload-btn">↻</button>
+                </div>
+                <div id="url-bar-container">
+                    <span id="ssl-padlock" title="Connection is secure">🔒</span>
+                    <input type="text" id="url-bar" value="https://google.com" placeholder="Search or type URL">
+                </div>
+                <button id="bookmark-btn" class="nav-btn" title="Bookmark this page">☆</button>
+                <div class="toolbar-right">
+                    <button id="watch-me-btn" class="watch-off">
+                        <span class="icon">👁️</span> Watch Me
+                    </button>
+                    <button id="easy-setup-btn" title="Easy Setup">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- The WebContentsView is injected by Electron below the toolbar, taking up the rest of the space -->
+            <!-- Command Palette Overlay -->
+            <div id="command-palette" class="hidden">
+                <div class="palette-container">
+                    <input type="text" id="palette-input" placeholder="Search Bookmarks & History...">
+                    <div id="palette-results"></div>
+                </div>
+            </div>
+
+            <!-- Downloads Panel -->
+            <div id="downloads-panel" class="hidden">
+                <div class="downloads-header">
+                    <span>Downloads</span>
+                    <button id="close-downloads-btn">×</button>
+                </div>
+                <div id="downloads-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const urlBar = document.getElementById('url-bar');
+        const bookmarkBtn = document.getElementById('bookmark-btn');
+        const backBtn = document.getElementById('back-btn');
+        const fwdBtn = document.getElementById('fwd-btn');
+        const reloadBtn = document.getElementById('reload-btn');
+        const newTabBtn = document.getElementById('new-tab-btn');
+        const tabsList = document.getElementById('tabs-list');
+        const watchMeBtn = document.getElementById('watch-me-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const aiToggleBtn = document.querySelector('.ai-toggle-btn');
+
+        // Sidebar logic
+        const toggleBtns = {
+            'ai': document.querySelector('.ai-toggle-btn'),
+            'discord': document.querySelector('.gx-icon[title="Discord"]'),
+            'twitch': document.querySelector('.gx-icon[title="Twitch"]'),
+            'whatsapp': document.querySelector('.gx-icon[title="WhatsApp"]'),
+            'player': document.querySelector('.gx-icon[title="Player"]'),
+            'gx-control': document.querySelector('.gx-control-btn')
+        };
+
+        Object.keys(toggleBtns).forEach(id => {
+            if (toggleBtns[id]) {
+                toggleBtns[id].addEventListener('click', () => {
+                    if (window.electronAPI) window.electronAPI.togglePanel(id);
+                });
+            }
+        });
+
+        const resizeHandle = document.getElementById('sidebar-resize-handle');
+        let isResizingPanel = false;
+        let resizeTicking = false;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizingPanel = true;
+            document.body.style.cursor = 'col-resize';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizingPanel) return;
+            if (!resizeTicking) {
+                window.requestAnimationFrame(() => {
+                    let newWidth = e.clientX - 48; // icon bar is 48px
+                    if (newWidth < 200) newWidth = 200;
+                    if (newWidth > 800) newWidth = 800;
+                    
+                    resizeHandle.style.left = (newWidth + 48 - 5) + 'px'; // -5 for center offset
+                    if (window.electronAPI) window.electronAPI.resizePanel(newWidth);
+                    resizeTicking = false;
+                });
+                resizeTicking = true;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizingPanel) {
+                isResizingPanel = false;
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        if (window.electronAPI && window.electronAPI.onPanelToggled) {
+            window.electronAPI.onPanelToggled((e, data) => {
+                const { activePanelId, panelWidth } = data;
+                
+                Object.values(toggleBtns).forEach(b => { if (b) b.style.background = 'transparent'; });
+                
+                const colorMap = {
+                    'ai': 'rgba(250, 30, 78, 0.2)',
+                    'discord': 'rgba(88, 101, 242, 0.2)',
+                    'twitch': 'rgba(145, 70, 255, 0.2)',
+                    'whatsapp': 'rgba(37, 211, 102, 0.2)',
+                    'player': 'rgba(248, 180, 0, 0.2)',
+                    'gx-control': 'rgba(0, 229, 255, 0.2)'
+                };
+                
+                if (activePanelId && toggleBtns[activePanelId]) {
+                    toggleBtns[activePanelId].style.background = colorMap[activePanelId];
+                    resizeHandle.style.display = 'block';
+                    resizeHandle.style.left = (panelWidth + 48 - 5) + 'px';
+                } else {
+                    resizeHandle.style.display = 'none';
+                }
+            });
+        }
+
+        // Settings Button
+        settingsBtn.addEventListener('click', () => {
+            window.electronAPI.openSettings();
+        });
+
+        let isWatching = false;
+        watchMeBtn.addEventListener('click', () => {
+            isWatching = !isWatching;
+            if (isWatching) {
+                watchMeBtn.classList.remove('watch-off');
+                watchMeBtn.classList.add('watch-on');
+                watchMeBtn.innerHTML = '<span class="icon">🔴</span> Recording...';
+                window.electronAPI.startRecording();
+            } else {
+                watchMeBtn.classList.remove('watch-on');
+                watchMeBtn.classList.add('watch-off');
+                watchMeBtn.innerHTML = '<span class="icon">👁️</span> Watch Me';
+                window.electronAPI.stopRecording();
+            }
+        });
+
+        // Navigation controls
+        urlBar.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                window.electronAPI.navigate(urlBar.value);
+            }
+        });
+
+        backBtn.addEventListener('click', () => window.electronAPI.goBack());
+        fwdBtn.addEventListener('click', () => window.electronAPI.goForward());
+        reloadBtn.addEventListener('click', () => window.electronAPI.reload());
+        
+        newTabBtn.addEventListener('click', () => window.electronAPI.newTab());
+        const newIncognitoBtn = document.getElementById('new-incognito-btn');
+        newIncognitoBtn.addEventListener('click', () => window.electronAPI.newTab(null, true));
+
+        // ─── Track current state ───
+        let currentUrl = '';
+        let currentTitle = '';
+
+        // ─── SINGLE URL listener ───
+        window.electronAPI.onUrlChanged((e, url) => {
+            urlBar.value = url;
+            currentUrl = url;
+            checkBookmarkStatus(url);
+            
+            // SSL Logic
+            const padlock = document.getElementById('ssl-padlock');
+            if (url.startsWith('https://')) {
+                padlock.className = 'secure';
+                padlock.textContent = '🔒';
+                padlock.title = "Connection is secure";
+            } else if (url.startsWith('http://')) {
+                padlock.className = 'insecure';
+                padlock.textContent = '🔓';
+                padlock.title = "Connection is NOT secure";
+            } else {
+                padlock.className = '';
+                padlock.textContent = '📄';
+                padlock.title = "Local Page";
+            }
+        });
+
+        // ─── SINGLE Tabs listener — renders tabs AND GX control ───
+        window.electronAPI.onTabsUpdated((event, tabs) => {
+            renderTabs(tabs);
+            
+            const activeTab = tabs.find(t => t.active);
+            if (activeTab) {
+                currentTitle = activeTab.title;
+            }
+        });
+
+        // ─── Render Tab Bar (with Tab Islands) ───
+        function renderTabs(tabs) {
+            const tabsContainer = document.getElementById('tabs-list');
+            tabsContainer.innerHTML = '';
+            
+            // Group tabs by groupId to build islands
+            const groups = {};
+            tabs.forEach(tab => {
+                if (!groups[tab.groupId]) groups[tab.groupId] = [];
+                groups[tab.groupId].push(tab);
+            });
+            
+            // Colors for islands
+            const colors = ['#FA1E4E', '#00FFA3', '#00E5FF', '#B142FE', '#FFDD00'];
+            let colorIdx = 0;
+
+            for (const groupId in groups) {
+                const groupTabs = groups[groupId];
+                const isIsland = groupTabs.length > 1;
+                const color = isIsland ? colors[(colorIdx++) % colors.length] : 'transparent';
+                
+                const islandWrapper = document.createElement('div');
+                if (isIsland) {
+                    islandWrapper.className = 'tab-island';
+                    islandWrapper.style.borderBottom = `2px solid ${color}`;
+                    islandWrapper.style.paddingBottom = '2px';
+                    islandWrapper.style.marginBottom = '-4px';
+                    islandWrapper.style.borderRadius = '2px';
+                } else {
+                    islandWrapper.className = 'tab-wrapper';
+                }
+                islandWrapper.style.display = 'flex';
+                islandWrapper.style.gap = '2px';
+                
+                groupTabs.forEach(tab => {
+                    const tabEl = document.createElement('div');
+                    tabEl.className = `tab ${tab.active ? 'active' : ''} ${tab.isIncognito ? 'incognito' : ''}`;
+                    const incognitoIcon = tab.isIncognito ? '<span title="Incognito" style="margin-right: 4px;">🕵️</span>' : '';
+                    tabEl.innerHTML = `
+                        ${incognitoIcon}
+                        <span class="tab-title">${tab.title || tab.url}</span>
+                        <div class="tab-close" data-id="${tab.id}">×</div>
+                    `;
+                    
+                    if (isIsland && tab.active) {
+                        tabEl.style.boxShadow = `0 -2px 0 ${color} inset`;
+                    }
+                    
+                    tabEl.addEventListener('click', (e) => {
+                        // Don't switch tab if clicking the close button
+                        if (e.target.classList.contains('tab-close')) return;
+                        window.electronAPI.switchTab(tab.id);
+                    });
+                    
+                    tabEl.addEventListener('contextmenu', () => {
+                        window.electronAPI.showTabContextMenu(tab.id);
+                    });
+
+                    // Close button handler
+                    const closeBtn = tabEl.querySelector('.tab-close');
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            window.electronAPI.closeTab(tab.id);
+                        });
+                    }
+
+                    islandWrapper.appendChild(tabEl);
+                });
+
+                tabsContainer.appendChild(islandWrapper);
+            }
+        }
+
+        // ─── Workspace Switching ───
+        document.querySelectorAll('.workspace-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                document.querySelectorAll('.workspace-icon').forEach(i => i.classList.remove('active'));
+                icon.classList.add('active');
+                window.electronAPI.switchWorkspace(icon.getAttribute('data-id'));
+            });
+        });
+
+        // Force workspace switch from Panic Button
+        if (window.electronAPI.onForceSwitchWorkspace) {
+            window.electronAPI.onForceSwitchWorkspace((e, workspaceId) => {
+                const icon = document.querySelector(`.workspace-icon[data-id="${workspaceId}"]`);
+                if (icon) icon.click();
+            });
+        }
+
+        // ─── Theme Listener ───
+        window.electronAPI.onThemeChanged((e, color) => {
+            document.documentElement.style.setProperty('--accent', color);
+            if (aiToggleBtn) aiToggleBtn.style.color = color;
+        });
+
+        // ─── Bookmark Logic ───
+        async function checkBookmarkStatus(url) {
+            const isBookmarked = await window.electronAPI.checkBookmark(url);
+            bookmarkBtn.textContent = isBookmarked ? '★' : '☆';
+            bookmarkBtn.style.color = isBookmarked ? 'var(--accent)' : 'var(--text-color)';
+        }
+
+        bookmarkBtn.addEventListener('click', () => {
+            window.electronAPI.toggleBookmark(currentUrl, currentTitle);
+            checkBookmarkStatus(currentUrl);
+        });
+
+        // ─── Command Palette Logic ───
+        const palette = document.getElementById('command-palette');
+        const paletteInput = document.getElementById('palette-input');
+        const paletteResults = document.getElementById('palette-results');
+        
+        let allItems = [];
+
+        window.addEventListener('keydown', async (e) => {
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                togglePalette();
+            }
+            if (e.key === 'Escape' && !palette.classList.contains('hidden')) {
+                togglePalette(false);
+            }
+        });
+
+        async function togglePalette(show) {
+            const isHidden = palette.classList.contains('hidden');
+            if (show === false || (!show && !isHidden)) {
+                palette.classList.add('hidden');
+            } else {
+                palette.classList.remove('hidden');
+                paletteInput.value = '';
+                paletteInput.focus();
+                
+                // Fetch data
+                const bookmarks = await window.electronAPI.getBookmarks();
+                const history = await window.electronAPI.getHistory();
+                
+                allItems = [
+                    ...bookmarks.map(b => ({ ...b, type: 'Bookmark' })),
+                    ...history.map(h => ({ ...h, type: 'History' }))
+                ];
+                renderPaletteResults('');
+            }
+        }
+
+        paletteInput.addEventListener('input', (e) => {
+            renderPaletteResults(e.target.value.toLowerCase());
+        });
+
+        function renderPaletteResults(query) {
+            paletteResults.innerHTML = '';
+            
+            const filtered = allItems.filter(item => 
+                (item.title && item.title.toLowerCase().includes(query)) || 
+                (item.url && item.url.toLowerCase().includes(query))
+            ).slice(0, 20);
+            
+            // Deduplicate by URL
+            const unique = [];
+            const urls = new Set();
+            for(let item of filtered) {
+                if(!urls.has(item.url)) {
+                    urls.add(item.url);
+                    unique.push(item);
+                }
+            }
+
+            if (unique.length === 0) {
+                paletteResults.innerHTML = '<div class="palette-item">No results found</div>';
+                return;
+            }
+
+            unique.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'palette-item';
+                div.innerHTML = `
+                    <span class="palette-type">${item.type}</span>
+                    <span class="palette-title">${item.title || item.url}</span>
+                    <span class="palette-url">${item.url}</span>
+                `;
+                div.addEventListener('click', () => {
+                    window.electronAPI.navigate(item.url);
+                    togglePalette(false);
+                });
+                paletteResults.appendChild(div);
+            });
+        }
+    </script>
+    
+    <!-- Easy Setup Panel -->
+    <div id="easy-setup-panel">
+        <div class="es-header">
+            <span style="color:#fa1e4e; font-weight:bold; letter-spacing:1px; font-size:12px;">EASY SETUP</span>
+            <div style="display:flex; gap:10px;">
+                <span class="es-icon">⚙</span>
+                <span class="es-icon" id="close-es-btn">✕</span>
+            </div>
+        </div>
+        
+        <div class="es-content">
+            <div class="es-section-title" style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+                <span>THEMES</span>
+                <span style="color:#fa1e4e; cursor:pointer;">Show all</span>
+            </div>
+            <div class="es-themes-grid">
+                <div class="es-theme-wrapper" data-color="#fa1e4e">
+                    <div class="es-theme-box" style="background-image:url('theme-red.png'); border-color:#fa1e4e;"></div>
+                    <span>Antigravity Red</span>
+                </div>
+                <div class="es-theme-wrapper" data-color="#9146FF">
+                    <div class="es-theme-box" style="background-image:url('theme-purple.png'); border-color:transparent;"></div>
+                    <span>Nebula Purple</span>
+                </div>
+                <div class="es-theme-wrapper" data-color="#00c3ff">
+                    <div class="es-theme-box" style="background-image:url('theme-blue.png'); border-color:transparent;"></div>
+                    <span>Quantum Blue</span>
+                </div>
+            </div>
+            
+            <div class="es-mode-toggle">
+                <div class="es-mode">Light</div>
+                <div class="es-mode">Auto</div>
+                <div class="es-mode active">Dark</div>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title" style="display:flex; justify-content:space-between;">
+                <span>WALLPAPERS</span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div class="es-switch on"></div>
+                    <span style="color:#fa1e4e; cursor:pointer;">Show all</span>
+                </div>
+            </div>
+            <div class="es-row">
+                <span>Antigravity Wallpaper</span>
+                <div class="es-radio active"></div>
+            </div>
+            <div class="es-row">
+                <span>Custom</span>
+                <div class="es-radio"></div>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title">APPEARANCE</div>
+            <div class="es-list">
+                <div class="es-row">
+                    <span>Interface</span>
+                    <select class="es-select"><option>Auto</option><option>Dark</option></select>
+                </div>
+                <div class="es-row">
+                    <span>Show window decoration</span>
+                    <select class="es-select"><option>Outside</option><option>Inside</option></select>
+                </div>
+                <div class="es-row">
+                    <span>Use Antigravity messenger icons</span>
+                    <div class="es-switch"></div>
+                </div>
+                <div class="es-row">
+                    <span>Colorize icons using primary color</span>
+                    <div class="es-switch on"></div>
+                </div>
+                <div class="es-row">
+                    <span>Show bookmarks bar</span>
+                    <div class="es-switch on"></div>
+                </div>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title">ANTIGRAVITY FEATURES</div>
+            <div class="es-list">
+                <div class="es-row"><span>Browser sounds</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Keyboard sounds</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Background music</span><div class="es-switch"></div></div>
+                <div class="es-row"><span>Show sidebar</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Force dark pages <span class="es-badge">BETA</span></span><div class="es-switch"></div></div>
+                <div class="es-row"><span>Shaders</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Web modding</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Splash screen on startup</span><div class="es-switch"></div></div>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title">EARLY BIRD</div>
+            <div class="es-early-bird">
+                <div style="flex:1;">Get new builds earlier and test features still in development.</div>
+                <button class="es-red-btn">Enable in Settings</button>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title">START PAGE</div>
+            <div class="es-list">
+                <div class="es-row">
+                    <span>Speed Dial position</span>
+                    <select class="es-select"><option>Auto</option></select>
+                </div>
+                <div class="es-row">
+                    <span>Speed Dial effect</span>
+                    <select class="es-select"><option>None</option></select>
+                </div>
+                <div class="es-row"><span>Show Speed Dial names</span><div class="es-switch"></div></div>
+                <div class="es-row"><span>Use bigger Speed Dial tiles</span><div class="es-switch"></div></div>
+                <div class="es-row"><span>Show Speed Dial suggestions</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Show News</span><div class="es-switch"></div></div>
+                <div class="es-row"><span>Game strips</span><div class="es-switch"></div></div>
+            </div>
+            
+            <div class="es-divider"></div>
+            
+            <div class="es-section-title">PRIVACY & SECURITY</div>
+            <div class="es-list">
+                <div class="es-row"><span>Block ads</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>Block trackers</span><div class="es-switch on"></div></div>
+                <div class="es-row"><span>VPN</span><button class="es-purple-btn">Enable in Settings</button></div>
+                <div class="es-row"><span>Browsing data</span><button id="es-clear-data-btn" class="es-purple-btn">Clear 🗑</button></div>
+            </div>
+            <div class="es-divider"></div>
+            
+            <div style="display:flex; justify-content:center; padding: 20px 0;">
+                <span style="color:#fa1e4e; font-size:13px; cursor:pointer; font-weight:bold; letter-spacing:1px;" onclick="window.electronAPI.openSettings()">Go to full browser settings</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Easy Setup panel logic
+        const esBtn = document.getElementById('easy-setup-btn');
+        const esPanel = document.getElementById('easy-setup-panel');
+        const closeEsBtn = document.getElementById('close-es-btn');
+        
+        esBtn.addEventListener('click', () => {
+            esPanel.classList.toggle('active');
+        });
+        
+        closeEsBtn.addEventListener('click', () => {
+            esPanel.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.es-switch').forEach(sw => {
+            sw.addEventListener('click', () => sw.classList.toggle('on'));
+        });
+        
+        document.querySelectorAll('.es-theme-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('click', () => {
+                document.querySelectorAll('.es-theme-box').forEach(b => b.style.borderColor = 'transparent');
+                wrapper.querySelector('.es-theme-box').style.borderColor = 'var(--accent)';
+                if (window.electronAPI && window.electronAPI.setTheme) {
+                    window.electronAPI.setTheme('custom', wrapper.getAttribute('data-color'));
+                }
+            });
+        });
+
+        const clearDataBtn = document.getElementById('es-clear-data-btn');
+        if (clearDataBtn) {
+            clearDataBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all browsing data (history, cookies, cache)? This cannot be undone.')) {
+                    if (window.electronAPI && window.electronAPI.clearBrowsingData) {
+                        window.electronAPI.clearBrowsingData();
+                    }
+                    const originalText = clearDataBtn.textContent;
+                    clearDataBtn.textContent = 'Cleared! ✓';
+                    setTimeout(() => clearDataBtn.textContent = originalText, 2000);
+                }
+            });
+        }
+
+        // ─── Download Manager Logic ───
+        const downloadsPanel = document.getElementById('downloads-panel');
+        const downloadsList = document.getElementById('downloads-list');
+        const closeDownloadsBtn = document.getElementById('close-downloads-btn');
+        const downloadElements = new Map();
+
+        closeDownloadsBtn.addEventListener('click', () => {
+            downloadsPanel.classList.add('hidden');
+        });
+
+        if (window.electronAPI && window.electronAPI.onDownloadStarted) {
+            window.electronAPI.onDownloadStarted((e, info) => {
+                downloadsPanel.classList.remove('hidden');
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = 'download-item';
+                itemEl.innerHTML = `
+                    <div class="download-filename" title="${info.fileName}">${info.fileName}</div>
+                    <div class="download-progress-bar">
+                        <div class="download-progress-fill" id="dl-fill-${info.id}"></div>
+                    </div>
+                    <div class="download-status" id="dl-status-${info.id}">Starting...</div>
+                `;
+                downloadsList.prepend(itemEl);
+                downloadElements.set(info.id, {
+                    fill: itemEl.querySelector(`#dl-fill-${info.id}`),
+                    status: itemEl.querySelector(`#dl-status-${info.id}`),
+                    container: itemEl
+                });
+            });
+
+            window.electronAPI.onDownloadUpdated((e, info) => {
+                const els = downloadElements.get(info.id);
+                if (!els) return;
+
+                if (info.state === 'progressing') {
+                    const percent = info.total ? Math.round((info.received / info.total) * 100) : 0;
+                    els.fill.style.width = `${percent}%`;
+                    els.status.textContent = `${(info.received / 1024 / 1024).toFixed(1)} MB / ${(info.total / 1024 / 1024).toFixed(1)} MB`;
+                } else if (info.state === 'completed') {
+                    els.fill.style.width = '100%';
+                    els.fill.style.background = '#00FFA3';
+                    els.status.textContent = `Completed`;
+                } else {
+                    els.fill.style.background = '#FA1E4E';
+                    els.status.textContent = info.state;
+                }
+            });
+        }
+    </script>
+
+    <!-- Local UI Audio Triggers -->
+    <script>
+        document.addEventListener('mousedown', (e) => { 
+            if(e.button === 0 && window.electronAPI && window.electronAPI.sendAudioEvent) {
+                window.electronAPI.sendAudioEvent('click'); 
+            }
+        });
+        document.addEventListener('keydown', (e) => { 
+            if (!['Shift', 'Control', 'Alt', 'Meta'].includes(e.key) && window.electronAPI && window.electronAPI.sendAudioEvent) {
+                window.electronAPI.sendAudioEvent('type');
+            } 
+        });
+        document.addEventListener('mouseover', (e) => {
+            if ((e.target.tagName === 'BUTTON' || e.target.closest('.tab') || e.target.closest('.sidebar-item')) 
+                 && window.electronAPI && window.electronAPI.sendAudioEvent) {
+                window.electronAPI.sendAudioEvent('hover');
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Dial</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0b0f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* The wavy background */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 120%, rgba(250, 30, 78, 0.15) 0%, transparent 60%),
+                linear-gradient(to bottom, #0b0b0f 0%, #15151c 100%);
+            z-index: -1;
+        }
+        
+        .background::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.02) 10px,
+                rgba(255,255,255,0.02) 20px
+            );
+            mask-image: linear-gradient(to top, black, transparent);
+            -webkit-mask-image: linear-gradient(to top, black, transparent);
+        }
+
+        .search-container {
+            margin-top: 10vh;
+            width: 600px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            background-color: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .grid-container {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            max-width: 1000px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .tile {
+            background-color: #1a1a24;
+            border-radius: 12px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tile:hover {
+            transform: translateY(-2px);
+            background-color: #22222d;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .tile-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1;
+        }
+
+        .tile-title {
+            font-size: 12px;
+            color: #ccc;
+            z-index: 1;
+        }
+        
+        /* Vibrant gradients based on screenshots */
+        .gradient-red { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+        .gradient-orange { background: linear-gradient(135deg, #f12711, #f5af19); }
+        .gradient-blue { background: linear-gradient(135deg, #0052D4, #4364F7, #6FB1FC); }
+        .gradient-dark { background: linear-gradient(135deg, #232526, #414345); }
+        
+        .add-tile {
+            border: 2px dashed rgba(255,255,255,0.2);
+            background: transparent;
+        }
+        .add-tile:hover {
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.02);
+        }
+        .add-tile .tile-icon { font-size: 32px; color: rgba(255,255,255,0.5); font-weight: normal; margin:0; }
+
+        .suggestions-header {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ddd;
+            text-align: left;
+        }
+        
+        .suggestions-grid {
+            display: flex;
+            gap: 15px;
+            max-width: 1000px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .suggestion-tile {
+            background-color: white;
+            border-radius: 8px;
+            height: 60px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .suggestion-tile:hover { transform: scale(1.05); }
+        .suggestion-tile.shopee { background: linear-gradient(135deg, #f53d2d, #ff6633); color: white; font-weight: bold; font-size: 18px; }
+        .suggestion-tile.dark { background: #1a1a24; }
+        
+        /* Modal Styles Redesign */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #252131; /* Opera dark purple modal */
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-label {
+            font-size: 13px;
+            color: #8b8598;
+            margin-bottom: -10px;
+        }
+        .modal-input {
+            background: #0b0b0f;
+            border: 1px solid #1a1a24;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+        .modal-input:focus { border-color: #fa1e4e; }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+        .modal-btn.ok { background: #fa1e4e; }
+        .modal-btn.ok:hover { background: #ff4772; }
+        .modal-btn.cancel { background: #4a4559; }
+        .modal-btn.cancel:hover { background: #5a5569; }
+
+        .delete-btn { display: none; } /* Replaced by context menu */
+
+        /* Suggestions Overlay Page */
+        #suggestions-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #111116;
+            z-index: 500;
+            flex-direction: column;
+            align-items: center;
+        }
+        #suggestions-overlay.active { display: flex; }
+        
+        .overlay-topbar {
+            width: 100%;
+            height: 60px;
+            background: #1a1a24;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .overlay-search {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            padding: 0 15px;
+        }
+        .overlay-add-custom {
+            background: #fa1e4e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .overlay-add-custom:hover { background: #ff4772; }
+        
+        .overlay-content {
+            flex: 1;
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+        .overlay-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        .overlay-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .overlay-card {
+            background: white;
+            height: 120px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+            transition: transform 0.2s;
+        }
+        .overlay-card:hover { transform: scale(1.05); }
+        .overlay-card-logo {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .overlay-card-title {
+            height: 30px;
+            background: #2a2a35;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="search-container">
+        <div class="search-icon">G</div>
+        <input type="text" class="search-bar" id="search-input" placeholder="Search the web">
+    </div>
+
+    <div class="grid-container" id="dial-grid">
+        <!-- Will be populated by JS -->
+    </div>
+    
+    <div class="suggestions-header" id="suggestions-header">Recent Searches (Suggestions)</div>
+    <div class="suggestions-grid" id="suggestions-grid">
+        <!-- Dynamically populated -->
+    </div>
+
+    <!-- Suggestions Overlay (Add to Antigravity) -->
+    <div id="suggestions-overlay">
+        <div class="overlay-topbar">
+            <span style="color:#888; font-size:16px;">🔍</span>
+            <input type="text" class="overlay-search" placeholder="Type address to add to your Speed Dial" id="overlay-search-input">
+            <button class="overlay-add-custom" onclick="openEditModal(-1)">Add to Antigravity <span>+</span></button>
+            <button class="overlay-add-custom" style="background:transparent; border:1px solid #555; color:#ccc;" onclick="document.getElementById('suggestions-overlay').classList.remove('active')">Close</button>
+        </div>
+        <div class="overlay-content">
+            <div class="overlay-title">SUGGESTIONS</div>
+            <div class="overlay-grid" id="overlay-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Dial Modal -->
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-label">Name</div>
+            <input type="text" class="modal-input" id="dial-title" value="AliExpress">
+            
+            <div class="modal-label" style="margin-top: 10px;">Address</div>
+            <input type="text" class="modal-input" id="dial-url" value="https://best.aliexpress.com/">
+            
+            <div class="modal-buttons">
+                <button class="modal-btn ok" id="save-dial-btn">OK</button>
+                <button class="modal-btn cancel" id="cancel-dial-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Speed Dial Context Menu -->
+    <div id="dial-context-menu" style="display:none; position:fixed; background:#1a1a24; border:1px solid #2a2a35; border-radius:6px; box-shadow:0 5px 20px rgba(0,0,0,0.5); width:200px; z-index:1000; padding:5px 0;">
+        <div class="ctx-item" id="ctx-new-tab">Open in new tab</div>
+        <div class="ctx-item" id="ctx-new-window">Open in new window</div>
+        <div class="ctx-item" id="ctx-new-private">Open in new private window</div>
+        <div style="height:1px; background:#2a2a35; margin:5px 0;"></div>
+        <div class="ctx-item" id="ctx-edit">Edit</div>
+        <div class="ctx-item" id="ctx-trash">Move to Trash</div>
+    </div>
+    <style>
+        .ctx-item { padding: 8px 15px; color: #a5a2b5; font-size: 13px; cursor: pointer; }
+        .ctx-item:hover { background: #fa1e4e; color: white; }
+    </style>
+
+    <script>
+        const defaultDials = [];
+
+        let dials = [];
+        try {
+            const saved = localStorage.getItem('gx_speed_dials');
+            if (saved) {
+                dials = JSON.parse(saved);
+            } else {
+                dials = [...defaultDials];
+            }
+        } catch(e) {
+            dials = [...defaultDials];
+        }
+
+        const grid = document.getElementById('dial-grid');
+        const modal = document.getElementById('add-modal');
+        
+        let contextMenuTargetIndex = -1;
+        const ctxMenu = document.getElementById('dial-context-menu');
+
+        function renderGrid() {
+            grid.innerHTML = '';
+            dials.forEach((dial, index) => {
+                const el = document.createElement('div');
+                el.className = `tile ${dial.class}`;
+                el.innerHTML = `
+                    <div class="tile-icon">${dial.icon}</div>
+                    <div class="tile-title">${dial.title}</div>
+                `;
+                el.onclick = () => nav(dial.url);
+                el.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    contextMenuTargetIndex = index;
+                    ctxMenu.style.display = 'block';
+                    ctxMenu.style.left = e.pageX + 'px';
+                    ctxMenu.style.top = e.pageY + 'px';
+                };
+                grid.appendChild(el);
+            });
+            
+            // Add button opens Suggestions Overlay
+            const addBtn = document.createElement('div');
+            addBtn.className = 'tile add-tile';
+            addBtn.innerHTML = `<div class="tile-icon">+</div>`;
+            addBtn.onclick = () => {
+                document.getElementById('suggestions-overlay').classList.add('active');
+                renderOverlaySuggestions();
+            };
+            grid.appendChild(addBtn);
+        }
+
+        // Hide context menu on click outside
+        document.addEventListener('click', () => {
+            ctxMenu.style.display = 'none';
+        });
+        
+        function saveAndRender() {
+            localStorage.setItem('gx_speed_dials', JSON.stringify(dials));
+            renderGrid();
+        }
+
+        document.getElementById('ctx-trash').onclick = () => {
+            if (contextMenuTargetIndex > -1) {
+                dials.splice(contextMenuTargetIndex, 1);
+                saveAndRender();
+            }
+        };
+
+        document.getElementById('ctx-edit').onclick = () => {
+            if (contextMenuTargetIndex > -1) {
+                openEditModal(contextMenuTargetIndex);
+            }
+        };
+
+        document.getElementById('ctx-new-tab').onclick = () => {
+            if (contextMenuTargetIndex > -1 && window.electronAPI && window.electronAPI.createTab) {
+                window.electronAPI.createTab(dials[contextMenuTargetIndex].url);
+            }
+        };
+
+        let editingIndex = -1;
+        function openEditModal(index) {
+            document.getElementById('suggestions-overlay').classList.remove('active');
+            editingIndex = index;
+            if (index > -1) {
+                document.getElementById('dial-title').value = dials[index].title;
+                document.getElementById('dial-url').value = dials[index].url;
+            } else {
+                document.getElementById('dial-title').value = '';
+                document.getElementById('dial-url').value = 'https://';
+            }
+            modal.classList.add('active');
+        }
+
+        function hideModal() {
+            modal.classList.remove('active');
+        }
+
+        document.getElementById('cancel-dial-btn').onclick = hideModal;
+
+        document.getElementById('save-dial-btn').onclick = () => {
+            const title = document.getElementById('dial-title').value.trim() || 'New Site';
+            const url = document.getElementById('dial-url').value.trim() || 'https://google.com';
+            
+            if (editingIndex > -1) {
+                dials[editingIndex].title = title;
+                dials[editingIndex].url = url;
+            } else {
+                // New dial
+                const colors = ['gradient-red', 'gradient-orange', 'gradient-blue', 'gradient-dark'];
+                dials.push({ 
+                    title, url, 
+                    class: colors[Math.floor(Math.random() * colors.length)], 
+                    icon: title.charAt(0).toUpperCase() 
+                });
+            }
+            saveAndRender();
+            hideModal();
+        };
+
+        function nav(url) {
+            window.location.href = url;
+        }
+
+        function saveSearch(query) {
+            let searches = [];
+            try {
+                const saved = localStorage.getItem('gx_recent_searches');
+                if (saved) searches = JSON.parse(saved);
+            } catch(e) {}
+            
+            // Remove exact duplicates
+            searches = searches.filter(s => s.query !== query);
+            
+            searches.unshift({ query, time: Date.now() });
+            localStorage.setItem('gx_recent_searches', JSON.stringify(searches));
+        }
+
+        function renderSuggestions() {
+            const grid = document.getElementById('suggestions-grid');
+            const header = document.getElementById('suggestions-header');
+            grid.innerHTML = '';
+            
+            let searches = [];
+            try {
+                const saved = localStorage.getItem('gx_recent_searches');
+                if (saved) searches = JSON.parse(saved);
+            } catch(e) {}
+            
+            const oneDay = 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            // Filter out old ones
+            searches = searches.filter(s => (now - s.time) < oneDay);
+            localStorage.setItem('gx_recent_searches', JSON.stringify(searches)); // Cleanup
+            
+            if (searches.length === 0) {
+                header.style.display = 'none';
+                return;
+            }
+            
+            header.style.display = 'block';
+            
+            searches.slice(0, 6).forEach(s => {
+                const el = document.createElement('div');
+                el.className = 'suggestion-tile dark';
+                el.innerHTML = `<span style="color:white;font-weight:bold;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 10px;">🔍 ${s.query}</span>`;
+                el.title = `Click to add "${s.query}" to Speed Dial`;
+                
+                el.onclick = () => {
+                    // Add to speed dial
+                    const searchUrl = 'https://google.com/search?q=' + encodeURIComponent(s.query);
+                    dials.push({ 
+                        title: s.query, 
+                        url: searchUrl, 
+                        class: 'gradient-blue', 
+                        icon: s.query.charAt(0).toUpperCase() 
+                    });
+                    saveAndRender();
+                };
+                grid.appendChild(el);
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && e.target.value.trim()) {
+                const query = e.target.value.trim();
+                saveSearch(query);
+                nav('https://google.com/search?q=' + encodeURIComponent(query));
+            }
+        });
+
+        // Theme Support
+        if (window.electronAPI && window.electronAPI.onThemeChanged) {
+            window.electronAPI.onThemeChanged((e, color) => {
+                // Update specific elements if needed
+            });
+        }
+
+        function renderOverlaySuggestions() {
+            const grid = document.getElementById('overlay-grid');
+            grid.innerHTML = '';
+            
+            // Hardcode some suggestions like the screenshot
+            const defaultSuggestions = [
+                { name: 'docs.google.com', url: 'https://docs.google.com', logo: '📄' },
+                { name: 'classroom.google.com', url: 'https://classroom.google.com', logo: 'Google' },
+                { name: 'github.com', url: 'https://github.com', logo: 'GH' },
+                { name: 'drive.google.com', url: 'https://drive.google.com', logo: '▲' }
+            ];
+            
+            let searches = [];
+            try {
+                const saved = localStorage.getItem('gx_recent_searches');
+                if (saved) searches = JSON.parse(saved);
+            } catch(e) {}
+            
+            const allSuggestions = [...searches.map(s => ({name: s.query, url: 'https://google.com/search?q='+encodeURIComponent(s.query), logo: s.query.charAt(0)})), ...defaultSuggestions];
+            
+            allSuggestions.slice(0, 12).forEach(s => {
+                const el = document.createElement('div');
+                el.className = 'overlay-card';
+                el.innerHTML = `
+                    <div class="overlay-card-logo" style="color: black;">${s.logo}</div>
+                    <div class="overlay-card-title">${s.name}</div>
+                `;
+                el.onclick = () => {
+                    const colors = ['gradient-red', 'gradient-orange', 'gradient-blue', 'gradient-dark'];
+                    dials.push({ 
+                        title: s.name, 
+                        url: s.url, 
+                        class: colors[Math.floor(Math.random() * colors.length)], 
+                        icon: s.logo 
+                    });
+                    saveAndRender();
+                    document.getElementById('suggestions-overlay').classList.remove('active');
+                };
+                grid.appendChild(el);
+            });
+        }
+        
+        document.getElementById('overlay-search-input').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && e.target.value.trim()) {
+                const query = e.target.value.trim();
+                const colors = ['gradient-red', 'gradient-orange', 'gradient-blue', 'gradient-dark'];
+                dials.push({ 
+                    title: query, 
+                    url: 'https://' + query, 
+                    class: colors[Math.floor(Math.random() * colors.length)], 
+                    icon: query.charAt(0).toUpperCase() 
+                });
+                saveAndRender();
+                document.getElementById('suggestions-overlay').classList.remove('active');
+            }
+        });
+
+        // Initial Render
+        renderGrid();
+        renderSuggestions();
+    </script>
+</body>
+</html>

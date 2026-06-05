@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Corner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --surface: rgba(31, 33, 42, 0.6);
+            --surface-hover: rgba(45, 48, 62, 0.8);
+            --primary: #45f3ff;
+            --primary-glow: rgba(69, 243, 255, 0.4);
+            --secondary: #ff2a6d;
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+            --border: rgba(255, 255, 255, 0.05);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(69, 243, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 42, 109, 0.08), transparent 25%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: overlay;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 48px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--primary), #a272fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .header-sub {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .game-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: var(--surface-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--primary-glow);
+        }
+
+        .game-img-container {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .game-card:hover .game-img {
+            transform: scale(1.08);
+        }
+
+        .badge-free {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 42, 109, 0.5);
+            z-index: 2;
+        }
+
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .game-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .game-platforms {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .game-platforms svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .card-footer {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .worth {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .btn-claim {
+            background: rgba(69, 243, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .game-card:hover .btn-claim {
+            background: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 42, 109, 0.1);
+            border: 1px solid rgba(255, 42, 109, 0.3);
+            border-radius: var(--radius-lg);
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>Antigravity Corner</h1>
+                <div class="header-sub">Daily free games, deals, and releases. <span id="status-text" style="font-size: 0.85em; color: var(--primary); margin-left: 10px;"></span></div>
+            </div>
+        </header>
+
+        <section>
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                Free Games
+            </h2>
+            <div id="gamesGrid" class="deals-grid">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <div>Scanning the multiverse for deals...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchGames();
+        });
+
+        async function fetchGames() {
+            const grid = document.getElementById('gamesGrid');
+            const status = document.getElementById('status-text');
+            try {
+                // Call our local python backend (instantly returns cached deals)
+                const response = await fetch('http://localhost:8000/api/games/free');
+                if (!response.ok) throw new Error('Failed to fetch deals');
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.games && data.games.length > 0) {
+                    renderGames(data.games);
+                    status.innerText = "• Data synced locally";
+                } else {
+                    throw new Error('No cached games found');
+                }
+            } catch (error) {
+                console.error(error);
+                status.innerText = "• Offline mode";
+                grid.innerHTML = `
+                    <div class="error-state" style="grid-column: 1 / -1;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px;">
+                            <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>Waiting for background aggregator to cache deals. The python server might be booting up...</div>
+                        <button class="btn-claim" style="margin-top: 16px; background: transparent; cursor: pointer;" onclick="fetchGames()">Refresh</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderGames(games) {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = '';
+            
+            // Render first 20 games to keep performance snappy
+            games.slice(0, 20).forEach(game => {
+                const card = document.createElement('a');
+                card.className = 'game-card';
+                card.href = game.open_giveaway_url || game.url || '#';
+                card.target = '_blank';
+                
+                // Parse platforms to icon string if needed
+                const platforms = game.platforms || game.platform || 'PC';
+                
+                card.innerHTML = \`
+                    <div class="game-img-container">
+                        <div class="badge-free">100% OFF</div>
+                        <img class="game-img" src="\${game.thumbnail || game.image}" alt="\${game.title}" loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="game-title">\${game.title}</h3>
+                        <div class="game-platforms">
+                            \${platforms}
+                        </div>
+                        <div class="card-footer">
+                            <span class="worth">\${game.worth === "N/A" ? "" : game.worth}</span>
+                            <span class="btn-claim">Claim</span>
+                        </div>
+                    </div>
+                \`;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
